@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, LogOut, CheckCircle2 } from "lucide-react";
@@ -14,6 +14,9 @@ import { CategoryChart } from "@/components/CategoryChart";
 import { AddHabitModal } from "@/components/AddHabitModal";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal";
 import { NewMonthModal } from "@/components/NewMonthModal";
+import { StreakBadge } from "@/components/StreakBadge";
+import { CelebrationModal } from "@/components/CelebrationModal";
+import { calculateStreak, checkMilestone, MILESTONES } from "@/lib/streaks";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -34,6 +37,14 @@ export default function Dashboard() {
   const [showNewMonthModal, setShowNewMonthModal] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [celebration, setCelebration] = useState<{
+    show: boolean;
+    streak: number;
+    habitName: string;
+    isNewRecord: boolean;
+  }>({ show: false, streak: 0, habitName: "", isNewRecord: false });
+  
+  const previousStreaksRef = useRef<Record<string, number>>({});
 
   const currentDay = useMemo(() => {
     if (currentMonth === now.getMonth() && currentYear === now.getFullYear()) {
@@ -52,6 +63,22 @@ export default function Dashboard() {
     const totalCompleted = habits.reduce((sum, h) => sum + h.completedDays.length, 0);
     return Math.round((totalCompleted / totalGoal) * 100);
   }, [habits]);
+
+  // Calculate best current streak across all habits
+  const bestStreak = useMemo(() => {
+    let best = { current: 0, longest: 0 };
+    habits.forEach((habit) => {
+      const streak = calculateStreak(habit.completedDays, currentDay, daysInMonth);
+      if (streak.currentStreak > best.current) {
+        best.current = streak.currentStreak;
+      }
+      const longest = habit.longestStreak || streak.longestStreak;
+      if (longest > best.longest) {
+        best.longest = longest;
+      }
+    });
+    return best;
+  }, [habits, currentDay, daysInMonth]);
 
   // Check auth on mount
   useEffect(() => {
@@ -165,19 +192,65 @@ export default function Dashboard() {
   };
 
   const handleToggleDay = (habitId: string, day: number) => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return;
+
+    const isCompleting = !habit.completedDays.includes(day);
+    const previousStreak = previousStreaksRef.current[habitId] || 0;
+
     const updated = habits.map(h => {
       if (h.id !== habitId) return h;
       
-      const isCompleted = h.completedDays.includes(day);
+      const newCompletedDays = isCompleting
+        ? [...h.completedDays, day]
+        : h.completedDays.filter(d => d !== day);
+      
+      // Update longest streak if needed
+      const newStreakData = calculateStreak(newCompletedDays, currentDay, daysInMonth);
+      const newLongestStreak = Math.max(h.longestStreak || 0, newStreakData.longestStreak);
+
       return {
         ...h,
-        completedDays: isCompleted
-          ? h.completedDays.filter(d => d !== day)
-          : [...h.completedDays, day],
+        completedDays: newCompletedDays,
+        longestStreak: newLongestStreak,
       };
     });
+
+    // Check for milestone or record
+    if (isCompleting) {
+      const updatedHabit = updated.find(h => h.id === habitId);
+      if (updatedHabit) {
+        const newStreakData = calculateStreak(updatedHabit.completedDays, currentDay, daysInMonth);
+        const milestone = checkMilestone(previousStreak, newStreakData.currentStreak);
+        const isRecord = newStreakData.currentStreak > previousStreak && 
+                         newStreakData.currentStreak > (habit.longestStreak || 0);
+
+        if (milestone || isRecord) {
+          setCelebration({
+            show: true,
+            streak: newStreakData.currentStreak,
+            habitName: habit.name,
+            isNewRecord: isRecord && !milestone,
+          });
+        }
+
+        // Update previous streak ref
+        previousStreaksRef.current[habitId] = newStreakData.currentStreak;
+      }
+    }
+
     saveGuestHabits(updated);
   };
+
+  // Initialize previous streaks ref
+  useEffect(() => {
+    const streaks: Record<string, number> = {};
+    habits.forEach((habit) => {
+      const streak = calculateStreak(habit.completedDays, currentDay, daysInMonth);
+      streaks[habit.id] = streak.currentStreak;
+    });
+    previousStreaksRef.current = streaks;
+  }, [habits.length]);
 
   const handleDeleteConfirm = () => {
     if (!deletingHabitId) return;
@@ -239,7 +312,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 space-y-8">
         {/* Top Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Welcome Card */}
           <div className="lg:col-span-2">
             <WelcomeCard habitsCount={habits.length} />
@@ -247,8 +320,16 @@ export default function Dashboard() {
           
           {/* Progress Ring */}
           <div className="glass rounded-2xl p-6 flex flex-col items-center justify-center animate-fade-in stagger-1">
-            <ProgressRing progress={totalProgress} size={140} strokeWidth={10} />
-            <p className="mt-4 text-sm text-muted-foreground">Monthly Progress</p>
+            <ProgressRing progress={totalProgress} size={120} strokeWidth={8} />
+            <p className="mt-3 text-sm text-muted-foreground">Monthly Progress</p>
+          </div>
+
+          {/* Best Streak */}
+          <div className="animate-fade-in stagger-2">
+            <StreakBadge
+              currentStreak={bestStreak.current}
+              longestStreak={bestStreak.longest}
+            />
           </div>
         </div>
 
@@ -311,6 +392,14 @@ export default function Dashboard() {
         monthName={MONTHS[currentMonth]}
         onStartFresh={handleStartFresh}
         onReuseHabits={handleReuseHabits}
+      />
+
+      <CelebrationModal
+        open={celebration.show}
+        onClose={() => setCelebration({ ...celebration, show: false })}
+        streak={celebration.streak}
+        habitName={celebration.habitName}
+        isNewRecord={celebration.isNewRecord}
       />
     </div>
   );

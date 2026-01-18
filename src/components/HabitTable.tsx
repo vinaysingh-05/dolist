@@ -1,7 +1,9 @@
-import { Pencil, Trash2, Check } from "lucide-react";
+import { Pencil, Trash2, Check, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { StreakBadge } from "./StreakBadge";
+import { calculateStreak } from "@/lib/streaks";
 
 export interface Habit {
   id: string;
@@ -9,6 +11,7 @@ export interface Habit {
   category: "Career" | "Health" | "Mindset";
   monthlyGoal: number;
   completedDays: number[];
+  longestStreak?: number;
 }
 
 interface HabitTableProps {
@@ -57,6 +60,12 @@ export function HabitTable({
                 Category
               </th>
               <th className="text-center p-4 text-sm font-medium text-muted-foreground">
+                <div className="flex items-center justify-center gap-1">
+                  <Flame className="w-4 h-4" />
+                  Streak
+                </div>
+              </th>
+              <th className="text-center p-4 text-sm font-medium text-muted-foreground">
                 Goal
               </th>
               {Array.from({ length: Math.min(daysInMonth, 31) }, (_, i) => (
@@ -81,7 +90,10 @@ export function HabitTable({
             </tr>
           </thead>
           <tbody>
-            {habits.map((habit, index) => (
+            {habits.map((habit, index) => {
+              const streakData = calculateStreak(habit.completedDays, currentDay, daysInMonth);
+              
+              return (
               <tr
                 key={habit.id}
                 className="border-b border-border/30 hover:bg-muted/30 transition-colors"
@@ -100,6 +112,13 @@ export function HabitTable({
                   >
                     {habit.category}
                   </Badge>
+                </td>
+                <td className="p-4 text-center">
+                  <StreakBadge
+                    currentStreak={streakData.currentStreak}
+                    longestStreak={habit.longestStreak || streakData.longestStreak}
+                    compact
+                  />
                 </td>
                 <td className="p-4 text-center">
                   <span className="text-sm text-muted-foreground">
@@ -169,7 +188,8 @@ export function HabitTable({
                   </div>
                 </td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </div>
