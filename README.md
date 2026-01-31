@@ -1,4 +1,5 @@
-HITLIST💚
+HITLIST💚 
+ ( USING AS GUEST LOGIN )
 
 HITLIST is a modern habit-tracking web app built for calm productivity.
 Track habits, reset every month, and visualize progress — without pressure.
