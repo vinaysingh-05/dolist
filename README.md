@@ -1,104 +1,81 @@
 <h1 align="center">💚 HITLIST — Calm Habit Tracker</h1>
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?size=26&duration=3000&color=00C896&center=true&vCenter=true&width=700&lines=Build+Habits+Without+Pressure;Track+Progress+Peacefully;Consistency+Over+Perfection;Minimal+Design+Maximum+Focus">
+  <img src="https://readme-typing-svg.herokuapp.com?size=26&duration=2800&color=00C896&center=true&vCenter=true&width=750&lines=Build+Habits+Peacefully;Consistency+Without+Pressure;Minimal+Design+Maximum+Focus;Your+Calm+Productivity+Companion">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Live-success?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/UX-Calm%20Design-00C896?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Focus-Productivity-blue?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/Productivity-Calm-green?style=for-the-badge">
+<img src="https://img.shields.io/badge/Design-Minimal-black?style=for-the-badge">
+<img src="https://img.shields.io/badge/UX-Soft%20Animations-00C896?style=for-the-badge">
+<img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge">
 </p>
 
 ---
 
-## 🌿 About HITLIST
-**HITLIST** is a modern habit-tracking web app designed for **calm productivity**.  
-Track habits, reset monthly, and visualize progress — without pressure or stress.
+# 🌿 About HITLIST
+> A modern habit tracker designed for **clarity, calmness, and sustainable growth**.
 
-> *Intentional habits. Clear months. Sustainable consistency.*
+Track habits daily, visualize progress, and start fresh every month — without guilt, stress, or streak anxiety.
 
 ---
 
-## ✨ Features
+# ✨ Core Experience
+
+<table>
+<tr>
+<td align="center">🔐 Secure Login</td>
+<td align="center">📅 Monthly Reset</td>
+<td align="center">📊 Analytics</td>
+<td align="center">💚 Calm UI</td>
+</tr>
+<tr>
+<td align="center">Data always saved</td>
+<td align="center">Fresh mindset</td>
+<td align="center">Visual progress</td>
+<td align="center">Soft animations</td>
+</tr>
+</table>
+
+---
+
+# 🧠 Feature Breakdown
 
 <details>
-<summary>🔐 Secure & Smart System</summary>
+<summary>Click to Expand Full Features</summary>
 
-- Safe login system  
-- Data saved automatically  
-- Come back anytime — progress remains  
+### 🟢 Tracking System
+- Daily checkmarks
+- Monthly habit grid
+- Instant updates
+
+### 🟢 Data Intelligence
+- Progress percentage
+- Bar charts
+- Pie charts
+
+### 🟢 User Control
+- Edit habits anytime
+- Delete with confirmation
+- Reset month manually
+
+### 🟢 Experience Design
+- Dark mode UI
+- Smooth transitions
+- Positive feedback messages
 
 </details>
 
 ---
 
-<details>
-<summary>📅 Monthly Reset Philosophy</summary>
+# 🔄 User Journey Flow
 
-- Each month starts fresh  
-- No guilt from previous habits  
-- Carry forward only what matters  
-
-</details>
-
----
-
-<details>
-<summary>✅ Daily Tracking</summary>
-
-- Check habits day-by-day  
-- Supports Day 1 → Day 31 tracking  
-- Simple interface for consistency  
-
-</details>
-
----
-
-<details>
-<summary>📊 Analytics Dashboard</summary>
-
-- Progress percentage tracker  
-- Daily bar charts  
-- Category pie charts  
-
-</details>
-
----
-
-<details>
-<summary>🗑️ Edit Freedom</summary>
-
-- Modify habits anytime  
-- Delete with confirmation  
-- Full control over your goals  
-
-</details>
-
----
-
-<details>
-<summary>💚 Experience Design</summary>
-
-- Calm UI  
-- Dark theme  
-- Soft animations  
-- Positive messages  
-
-</details>
-
----
-flowchart LR
-A(User Login) --> B(Create Habit)
-B --> C(Daily Tracking)
-C --> D(Analytics Dashboard)
-D --> E(Progress Growth)
-
-## 🧠 Concept Philosophy
-
-```text
-No pressure.
-No streak anxiety.
-No guilt loops.
-
-Only progress.
+```mermaid
+flowchart TD
+Start([User Opens App]) --> Login
+Login --> Dashboard
+Dashboard --> CreateHabit
+CreateHabit --> TrackDaily
+TrackDaily --> Analytics
+Analytics --> Motivation
+Motivation --> TrackDaily
