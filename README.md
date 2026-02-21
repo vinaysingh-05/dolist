@@ -88,6 +88,11 @@ Track habits, reset monthly, and visualize progress — without pressure or stre
 </details>
 
 ---
+flowchart LR
+A(User Login) --> B(Create Habit)
+B --> C(Daily Tracking)
+C --> D(Analytics Dashboard)
+D --> E(Progress Growth)
 
 ## 🧠 Concept Philosophy
 
